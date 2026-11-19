@@ -1,0 +1,1111 @@
+{
+  "name": "workflow principal del CRM",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "293605ef-011f-40e1-aede-bf3091201b78",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7200e8dd-bf27-49b4-b66e-c92657975352",
+              "name": "nombre",
+              "value": "Laura",
+              "type": "string"
+            },
+            {
+              "id": "bb175921-4ff5-4e25-b340-7e32ba1be2cd",
+              "name": "empresa",
+              "value": "Empresa ABC",
+              "type": "string"
+            },
+            {
+              "id": "03eb7a5f-ffcf-4d48-ab9b-5a6db5f3f148",
+              "name": "servicio_interes",
+              "value": "Automatización de ventas",
+              "type": "string"
+            },
+            {
+              "id": "6d94215f-029b-4ce4-ac75-72246e3ceb09",
+              "name": "clasificacion",
+              "value": "seguimiento",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        0,
+        224
+      ],
+      "id": "9de440b7-a25a-4bc9-853b-86622ed4ce19",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.clasificacion_normalizada }}",
+                    "rightValue": "caliente",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "81223129-790a-468c-a0a5-dfbda8d94730"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "caliente"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "bc36e51d-2680-4525-b684-8b5fe259dd7b",
+                    "leftValue": "={{ $json.clasificacion_normalizada }}",
+                    "rightValue": "tibio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "tibio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "3876b8a8-e5b1-4500-beb5-a0edb0170aab",
+                    "leftValue": "={{ $json.clasificacion_normalizada }}",
+                    "rightValue": "no_calificado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no calificado"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "8f9d450f-91ba-4ff0-8a6c-ca5ad9a37f72",
+                    "leftValue": "={{ $json.clasificacion_normalizada }}",
+                    "rightValue": "seguimiento",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "seguimiento"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1040,
+        64
+      ],
+      "id": "5edba7c2-567a-4eb7-972b-403fd097f18e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "REEMPLAZAR_RUTA_WEBHOOK",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        672,
+        -208
+      ],
+      "id": "8eb013b4-193d-45c2-a022-d94ddadb2dea",
+      "name": "Webhook"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REEMPLAZAR_ID_GOOGLE_SHEETS",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "REEMPLAZAR_NOMBRE_PESTANA",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "nombre ": "={{ $('Webhook').first().json.body.nombre }}",
+            "empresa ": "={{ $('Webhook').first().json.body.empresa }}",
+            "servicio_interes": "={{ $('Webhook').first().json.body.servicio_interes }}",
+            "clasificacion": "={{ $('Normalizar Clasificacion').first().json.clasificacion_normalizada }}",
+            "fecha_registro": "={{ $now.toFormat('yyyy-MM-dd HH:mm:ss') }}",
+            "email": "={{ $('Normalizar Clasificacion').first().json.email_normalizado }}",
+            "estado_revision": "={{ ['caliente', 'tibio', 'no_calificado', 'seguimiento'].includes($('Normalizar Clasificacion').first().json.clasificacion_normalizada) ? 'validado' : 'pendiente_revision' }}",
+            "estado_notificacion": "={{ $('Normalizar Clasificacion').first().json.clasificacion_normalizada === 'caliente' ? 'pendiente' : 'no_aplica' }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "nombre ",
+              "displayName": "nombre ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "empresa ",
+              "displayName": "empresa ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "servicio_interes",
+              "displayName": "servicio_interes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "clasificacion",
+              "displayName": "clasificacion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fecha_registro",
+              "displayName": "fecha_registro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "estado_revision",
+              "displayName": "estado_revision",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "estado_notificacion",
+              "displayName": "estado_notificacion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1280,
+        480
+      ],
+      "id": "fd1e0821-e203-4260-bbcd-327d2593db03",
+      "name": "Append row in sheet"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REEMPLAZAR_ID_GOOGLE_SHEETS",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "REEMPLAZAR_NOMBRE_PESTANA",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "email",
+              "lookupValue": "={{ $('Normalizar Clasificacion').first().json.email_normalizado }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        864,
+        464
+      ],
+      "id": "c9ee20a5-988d-4726-9154-dda04292df7a",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5ad03104-6458-4360-863c-77e38a401e4d",
+              "leftValue": "={{ $json.row_number }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1056,
+        464
+      ],
+      "id": "ea6afa61-8890-420e-95a4-f0ee506f739a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5f754241-62d6-4f30-806d-784c76ec9ffd",
+              "leftValue": "={{ String($json.body.email ?? '').trim().toLowerCase() }}",
+              "rightValue": "^[^ @]+@[^ @]+\\.[^ @]+$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            },
+            {
+              "id": "3f310cb5-f259-4094-82cf-f8bd8524f8aa",
+              "leftValue": "={{ $json.body.nombre }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "006fd92e-2c7e-40cb-9820-ddde7b7ad88b",
+              "leftValue": "={{ $json.body.empresa }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "b78d9e25-eb32-4fa0-9ed9-231c70a7a939",
+              "leftValue": "={{ $json.body.servicio_interes }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "c323400f-7cbb-4896-b15f-a2b7988099b6",
+              "leftValue": "={{ $json.body.clasificacion }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        896,
+        -176
+      ],
+      "id": "2cf85b40-330a-4374-ad54-7d4411619fef",
+      "name": "IF - Validar Datos del Lead"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f85d4f00-03ac-4a81-aa53-b70380492f0c",
+              "name": "clasificacion_normalizada",
+              "value": "={{ ['super urgente', 'urgente'].includes($json.body.clasificacion.trim().toLowerCase()) ? 'caliente' : $json.body.clasificacion.trim().toLowerCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "95109684-8452-4f7b-b6e5-3b49dcab1b46",
+              "name": "email_normalizado",
+              "value": "={{ String($json.body.email ?? '').trim().toLowerCase() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1120,
+        -176
+      ],
+      "id": "5f2f3089-3733-428d-ad59-01c9900ef858",
+      "name": "Normalizar Clasificacion"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "412ddb8d-227c-487c-a4a8-1832bdf0ea21",
+              "name": "estado_revision",
+              "value": "pendiente_revision",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1248,
+        240
+      ],
+      "id": "7709df43-b3f3-489e-8192-7a1d7d8db19a",
+      "name": "Marcar Revision Pendiente"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e8ef7f22-d3c4-45ad-8a84-b1996b0967aa",
+              "leftValue": "={{ $('Normalizar Clasificacion').first().json.clasificacion_normalizada }}",
+              "rightValue": "caliente",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1520,
+        480
+      ],
+      "id": "41f7977c-8225-41bd-9736-ab4a2d1d7924",
+      "name": "IF - Lead Caliente"
+    },
+    {
+      "parameters": {
+        "sendTo": "REEMPLAZAR_DESTINATARIO@example.com",
+        "subject": "🔥 Nuevo prospecto caliente - CRM",
+        "message": "=🔥 ALERTA: NUEVO PROSPECTO CALIENTE  Se ha registrado un nuevo prospecto de alta prioridad en nuestro CRM.  👤 Nombre: {{ $('Webhook').first().json.body.nombre }} 🏢 Empresa: {{ $('Webhook').first().json.body.empresa }} 📧 Correo: {{ $('Webhook').first().json.body.email }} 🛠️ Servicio solicitado: {{ $('Webhook').first().json.body.servicio_interes }} 📊 Clasificación: {{ $('Normalizar Clasificacion').first().json.clasificacion_normalizada }}  ⚡ ACCIÓN REQUERIDA: Contactar al prospecto lo antes posible para dar seguimiento a su solicitud.  Notificación automática generada por nuestro CRM en n8n.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1664,
+        384
+      ],
+      "id": "28deede5-8840-4fe9-88fd-c9b30d811492",
+      "name": "Gmail - Alerta Lead Caliente",
+      "retryOnFail": true,
+      "waitBetweenTries": 3000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REEMPLAZAR_ID_GOOGLE_SHEETS",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "REEMPLAZAR_NOMBRE_PESTANA",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $('Normalizar Clasificacion').first().json.email_normalizado }}",
+            "estado_notificacion": "fallido"
+          },
+          "matchingColumns": [
+            "email"
+          ],
+          "schema": [
+            {
+              "id": "nombre ",
+              "displayName": "nombre ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "empresa ",
+              "displayName": "empresa ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "servicio_interes",
+              "displayName": "servicio_interes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "clasificacion",
+              "displayName": "clasificacion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "fecha_registro",
+              "displayName": "fecha_registro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "estado_revision",
+              "displayName": "estado_revision",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "estado_notificacion",
+              "displayName": "estado_notificacion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1888,
+        480
+      ],
+      "id": "1a41bd7d-5e4a-4740-b255-6d75ff952b73",
+      "name": "Registrar Fallo Gmail"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REEMPLAZAR_ID_GOOGLE_SHEETS",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "REEMPLAZAR_NOMBRE_PESTANA",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $('Normalizar Clasificacion').first().json.email_normalizado }}",
+            "estado_notificacion": "enviado"
+          },
+          "matchingColumns": [
+            "email"
+          ],
+          "schema": [
+            {
+              "id": "nombre ",
+              "displayName": "nombre ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "empresa ",
+              "displayName": "empresa ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "servicio_interes",
+              "displayName": "servicio_interes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "clasificacion",
+              "displayName": "clasificacion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "fecha_registro",
+              "displayName": "fecha_registro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "estado_revision",
+              "displayName": "estado_revision",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "estado_notificacion",
+              "displayName": "estado_notificacion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1888,
+        288
+      ],
+      "id": "313b1356-21b7-4b24-a5e4-b7f7b0783dc4",
+      "name": "Registrar Envio Exitoso"
+    },
+    {
+      "parameters": {
+        "url": "https://jsonplaceholder.typicode.com/users/1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        208,
+        224
+      ],
+      "id": "9be6d738-6e3d-405b-89c2-7c5f00833819",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "03f0b96d-7431-46c5-9ba0-be86d4fb23dc",
+              "name": "nombre",
+              "value": "={{ $json.name.trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "30cbc9b7-dbd2-4e8b-bbc5-393afe078ad3",
+              "name": "email",
+              "value": "={{ $json.email.trim().toLowerCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "ac8abad1-e2ae-473e-88de-df3880aa3ac9",
+              "name": "telefono",
+              "value": "={{ $json.phone.trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        384,
+        224
+      ],
+      "id": "3a8d27ec-9eed-4346-98f2-b4e18543726c",
+      "name": "Preparar Datos API"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "299d9bb5-10ac-44b5-ab88-39031654d297",
+              "leftValue": "={{ $json.nombre }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "27949fcb-f7e4-491e-a33c-69c2928ce0e0",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "5b6d08dd-94e7-4b06-8141-a9f470d01ea3",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "=^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        464,
+        560
+      ],
+      "id": "6bd8d8dc-5740-47d0-8772-19218dceeed3",
+      "name": "IF - Validar Datos API"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "IF - Validar Datos del Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Marcar Revision Pendiente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Validar Datos del Lead": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Clasificacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar Clasificacion": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcar Revision Pendiente": {
+      "main": [
+        []
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "IF - Lead Caliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Lead Caliente": {
+      "main": [
+        [
+          {
+            "node": "Gmail - Alerta Lead Caliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Alerta Lead Caliente": {
+      "main": [
+        [
+          {
+            "node": "Registrar Envio Exitoso",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Registrar Fallo Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Preparar Datos API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Datos API": {
+      "main": [
+        [
+          {
+            "node": "IF - Validar Datos API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "nodeGroups": [],
+  "tags": []
+}
